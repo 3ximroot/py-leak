@@ -48,14 +48,15 @@ def inserter(pathes,P_ID):
                 lines = input_file.read().splitlines()
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 for line in lines:
-                    line_ob = eval(line)
-                    if(line_ob != None):
-                        row = line_ob.get('results',line_ob)
-                        if(row):
-                            split = split_line(row,file_path)
-                            if(split):
-                                current_batch.append(split)
-                                INSERTED_ROWS +=1
+                    line_ob = eval(line).get('result')['items']
+                    for ob in line_ob:
+                        if(ob != None):
+                            row = ob
+                            if(row):
+                                split = split_line(row,file_path)
+                                if(split):
+                                    current_batch.append(split)
+                                    INSERTED_ROWS +=1
                         
             except Exception:
                 print(traceback.format_exc())
