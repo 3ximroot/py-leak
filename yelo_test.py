@@ -7,10 +7,9 @@ INSERTED_ROWS = 0
 
 def split_line(txt, source):
     try:
-        object_line = eval(txt)
+        object_line = txt
         return {"name":object_line['fullName'].get('displayName',None),
                 "phone":object_line['contactInformation'].get('primaryPhone',None),
-                "s_phone":object_line['contactInformation'].get('secondaryPhone',None),
                 "s_phone":object_line['contactInformation'].get('secondaryPhone',None),
                 "email":object_line['contactInformation'].get('email',None),
                 "dob":object_line['basicInformation'].get('dateOfBirth',None),
@@ -32,11 +31,12 @@ def inserter(pathes,P_ID):
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 for line in lines:
                     line_ob = eval(line)
-                    row = line_ob.get('results',line_ob)
-                    if(row != None):
-                        split = split_line(row)
-                        if(split):
-                            current_batch.append(split)
+                    if(line_ob != None):
+                        row = line_ob.get('results',line_ob)
+                        if(row):
+                            split = split_line(row,file_path)
+                            if(split):
+                                current_batch.append(split)
                 print(current_batch[0:200])
             except Exception:
                 print(traceback.format_exc())
@@ -44,7 +44,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/nawafpr8e/iyelo/done'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

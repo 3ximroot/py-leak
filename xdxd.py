@@ -1,4 +1,3 @@
-
 import threading
 import multiprocessing
 import numpy as np
@@ -19,9 +18,16 @@ INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 def split_line(txt):
-    striper = txt.strip().split(' ',maxsplit=3)
-    row =  [eval(striper[3])[0]['name'],striper[2]]
-    return row
+    delims = [':',';',' ']
+    for d in delims:
+        result = txt.strip().split(d)
+        if len(result) >= 3: 
+            result[0] = result[0].strip()
+            result[1] = result[1].strip()
+            result[2] = result[2].strip()
+            return result
+
+    return [txt] # If nothing worked, return the input
 
 def delete_inserted_file(file_path):
     if os.path.exists(file_path):
@@ -38,15 +44,19 @@ def inserter(pathes,P_ID):
         current_batch = []
         insert_s_time = time.time()
         with open(file_path,"r") as input_file:
-            lines = input_file.read().splitlines()
-            print("\n start file "+file_path+" =>" + str(P_ID))
-            for line in lines: 
-                split = split_line(line)
-                if(len(split) ==2):
-                    name = split[0]
-                    phone = split[1].split("\n")[0] or split[1]
-                    current_batch.append({"name":name, "phone":phone, "source":file_path})
-                    INSERTED_ROWS +=1
+            try:
+                print("\n start file "+file_path+" =>" + str(P_ID))
+                lines = input_file.read().splitlines()
+                for line in lines: 
+                    split = split_line(line)
+                    if(len(split) >=3):
+                        email = split[2]
+                        username = split[0]
+                        password = split[1].split("\n")[0] or split[1]
+                        current_batch.append({"username":username, "email":email, "password":password, "source":file_path})
+                        INSERTED_ROWS +=1
+            except:
+                print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
@@ -61,7 +71,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter(producers_count):
     global TOTAL_FILES
-    reader_path = '/home/nawaf/nawafpr8e/caller_id'
+    reader_path = '/home/nawaf/Desktop/py-leak'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

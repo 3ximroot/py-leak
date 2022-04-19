@@ -36,7 +36,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter(producers_count):
     global TOTAL_FILES
-    reader_path = '/home/asim/Downloads/Programming/Python lab/splitted/splitters/x'
+    reader_path = '/home/nawaf/splitted/facebook/splitters/'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

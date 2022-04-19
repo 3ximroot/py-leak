@@ -6,18 +6,18 @@ INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 def split_line(txt):
-    object_line = eval(txt)
-    phone_object = next((x for x in object_line.custom_attributes if x.attribute_code == 'mobile_number'), None)
-    phone = ''
-    if phone_object != None:
-        phone = phone_object.value
-    return {"firstname":object_line.firstname,"lastname":object_line.lastname,"phone":phone,
-    "dob": object_line.dob,"email":object_line.email,"adresses":object_line.adresses}
+    try:
+        if(txt != None):
+            object_line = eval(txt)
+            phone_object = next((x for x in object_line['custom_attributes'] if x['attribute_code'] == 'mobile_number'), None)
+            phone = ''
+            if phone_object != None:
+                phone = phone_object['value']
+            return {"firstname":object_line['firstname'],"lastname":object_line['lastname'],"phone":phone,
+            "dob": object_line['dob'],"email":object_line['email'],"adresses":object_line['addresses']}
+    except:
+        return txt
 
-def delete_inserted_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return True
 
 
 def inserter(pathes,P_ID):
@@ -32,14 +32,19 @@ def inserter(pathes,P_ID):
             lines = input_file.read().splitlines()
             print("\n start file "+file_path+" =>" + str(P_ID))
             for line in lines:
-                if(line.startswith("{'id':")): 
-                    split = split_line(line)
-                    print(split)
+                    if(line.startswith("{'id':")): 
+                        if(line != None):
+                            split = split_line(line)
+                            if(split):
+                                current_batch.append(split)
+                                INSERTED_ROWS +=1
+
+            print(current_batch)
         
 
-def path_splitter(producers_count):
+def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/nawafpr8e/nahdi'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
@@ -47,7 +52,6 @@ def path_splitter(producers_count):
                 TOTAL_FILES +=1
                 start_t = time.time()
                 pathes.append(os.path.join(path, file))
-    #batches = np.array_split(pathes,producers_count)
     return pathes
 
 def main():

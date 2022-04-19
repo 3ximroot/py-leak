@@ -1,12 +1,12 @@
 import os,time
 
-lines_per_file = 1000000
+lines_per_file = 5000000
 smallfile = None
-splitted_path = '/home/asim/Downloads/Programming/Python lab/splitted'
+splitted_path = '/home/nawaf/people'
 t = time.time()
-for path, currentDirectory, files in os.walk("/home/asim/Downloads/Programming/Python lab/dataleak"):
+for path, currentDirectory, files in os.walk("/home/nawaf/Templates/PeopleDataLabs_416M.json"):
     for file in files:
-        if file.endswith(".txt"):
+        if file.endswith(".json"):
             folder_name = os.path.basename(path)
             file_name = os.path.splitext(file)[0]
             with open(os.path.join(path, file)) as bigfile:
@@ -26,3 +26,4 @@ for path, currentDirectory, files in os.walk("/home/asim/Downloads/Programming/P
                 except Exception as e:
                     pass
 print ("\n Time Taken: %.3f sec" % (time.time()-t))
+

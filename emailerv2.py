@@ -3,6 +3,7 @@ import multiprocessing
 import numpy as np
 import os,time
 from pymongo import MongoClient
+import gc
  
  
 myclient = MongoClient("mongodb://localhost:27017/")
@@ -38,20 +39,24 @@ def inserter(pathes,P_ID):
     global TOTAL_FILES
     global INSERTED_FILES
     global INSERTED_ROWS
-    for file_path in pathes[P_ID]:
+    for file_path in pathes:
+        gc.collect()
         input_file = open(file_path,"r")
         current_batch = []
         insert_s_time = time.time()
         with open(file_path,"r") as input_file:
-            lines = input_file.read().splitlines()
-            print("\n start file "+file_path+" =>" + str(P_ID))
-            for line in lines: 
-                split = split_line(line)
-                if(len(split) ==2):
-                    email = split[0]
-                    password = split[1].split("\n")[0] or split[1]
-                    current_batch.append({"email":email, "password":password, "source":file_path})
-                    INSERTED_ROWS +=1
+            try:
+                print("\n start file "+file_path+" =>" + str(P_ID))
+                lines = input_file.read().splitlines()
+                for line in lines: 
+                    split = split_line(line)
+                    if(len(split) ==2):
+                        email = split[0]
+                        password = split[1].split("\n")[0] or split[1]
+                        current_batch.append({"email":email, "password":password, "source":file_path})
+                        INSERTED_ROWS +=1
+            except:
+                print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
@@ -66,7 +71,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter(producers_count):
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/splitted/splitters'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

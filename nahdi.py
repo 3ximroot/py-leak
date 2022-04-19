@@ -1,4 +1,4 @@
-import os,time
+import os,time,traceback
 from pymongo import MongoClient
  
  
@@ -14,14 +14,18 @@ TOTAL_FILES = 0
 INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
-def split_line(txt):
-    object_line = eval(txt)
-    phone_object = next((x for x in object_line.custom_attributes if x.attribute_code == 'mobile_number'), None)
-    phone = ''
-    if phone_object != None:
-        phone = phone_object.value
-    return {"firstname":object_line.firstname,"lastname":object_line.lastname,"phone":phone,
-    "dob": object_line.dob,"email":object_line.email,"adresses":object_line.adresses}
+def split_line(txt, source):
+    try:
+        if(txt != None):
+            object_line = eval(txt)
+            phone_object = next((x for x in object_line['custom_attributes'] if x['attribute_code'] == 'mobile_number'), None)
+            phone = ''
+            if phone_object != None:
+                phone = phone_object['value']
+            return {"firstname":object_line['firstname'],"lastname":object_line['lastname'],"phone":phone,
+            "dob": object_line.get('dob', None),"email":object_line['email'],"adresses":object_line['addresses'], "source":source}
+    except Exception:
+        print(traceback.format_exc())
 
 def delete_inserted_file(file_path):
     if os.path.exists(file_path):
@@ -43,12 +47,13 @@ def inserter(pathes,P_ID):
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 for line in lines:
                     if(line.startswith("{'id':")): 
-                        split = split_line(line)
-                        if(split):
-                            current_batch.append(split)
-                            INSERTED_ROWS +=1
-            except:
-                print('** File'+file_path+' failed to insert => skip')
+                        if(line != None):
+                            split = split_line(line,file_path)
+                            if(split):
+                                current_batch.append(split)
+                                INSERTED_ROWS +=1
+            except Exception:
+                print(traceback.format_exc())
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
@@ -57,13 +62,13 @@ def inserter(pathes,P_ID):
                 print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
-            except:
-                print('** File'+file_path+' failed to insert => skip')
+            except Exception:
+                print(traceback.format_exc())
         
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/nawafpr8e/nahdi'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
