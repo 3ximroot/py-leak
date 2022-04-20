@@ -31,12 +31,17 @@ def inserter(pathes,P_ID):
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 for line in lines:
                     line_ob = eval(line)
+                    line_ob = line_ob.get('result',None)
+                    
                     if(line_ob != None):
-                        row = line_ob.get('results',line_ob)
-                        if(row):
-                            split = split_line(row,file_path)
-                            if(split):
-                                current_batch.append(split)
+                        line_ob = line_ob.get('items',None)
+                        for ob in line_ob:
+                            if(ob != None):
+                                row = ob
+                                if(row):
+                                    split = split_line(row,file_path)
+                                    if(split):
+                                        current_batch.append(split)
                 print(current_batch[0:200])
             except Exception:
                 print(traceback.format_exc())
@@ -44,7 +49,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/nawafpr8e/iyelo/done'
+    reader_path = '/home/nawaf/nawafpr8e/iyelo'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

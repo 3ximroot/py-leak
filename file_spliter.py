@@ -1,12 +1,14 @@
-import os,time
+import os,time,traceback
 
 lines_per_file = 5000000
 smallfile = None
-splitted_path = '/home/nawaf/people'
+splitted_path = '/home/nawaf/Canva_RF'
 t = time.time()
-for path, currentDirectory, files in os.walk("/home/nawaf/Templates/PeopleDataLabs_416M.json"):
+for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Canva_RF/Data"):
+    
     for file in files:
-        if file.endswith(".json"):
+        if file.endswith(".txt"):
+            print(files)
             folder_name = os.path.basename(path)
             file_name = os.path.splitext(file)[0]
             with open(os.path.join(path, file)) as bigfile:
@@ -24,6 +26,6 @@ for path, currentDirectory, files in os.walk("/home/nawaf/Templates/PeopleDataLa
                     if smallfile:
                         smallfile.close()
                 except Exception as e:
-                    pass
+                    print(traceback.format_exc())
 print ("\n Time Taken: %.3f sec" % (time.time()-t))
 

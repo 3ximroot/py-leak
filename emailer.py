@@ -1,7 +1,7 @@
 import threading
 import multiprocessing
 import numpy as np
-import os,time
+import os,time,traceback
 from pymongo import MongoClient
  
  
@@ -45,31 +45,37 @@ def inserter(pathes,P_ID):
         with open(file_path,"r") as input_file:
             try:
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                lines = input_file.read().splitlines()
-                for line in lines: 
-                    split = split_line(line)
+                #lines = input_file.read().splitlines()
+                for line in input_file: 
+                    split = []
+                    try:
+                        split = split_line(line)
+                    except Exception:
+                        pass
                     if(len(split) ==2):
                         email = split[0]
                         password = split[1].split("\n")[0] or split[1]
                         current_batch.append({"email":email, "password":password, "source":file_path})
                         INSERTED_ROWS +=1
-            except:
+            except Exception:
+                print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
                 collection.insert_many(current_batch, ordered=False)
                 delete_inserted_file(file_path)
-                print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
+                print("\n inserted  in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
-            except:
+            except Exception:
+                print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         
 
 def path_splitter(producers_count):
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/nawafmhm/Twitter_RF'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

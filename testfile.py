@@ -1,16 +1,17 @@
-import os,time,re
+
+import os,time,traceback
+
+
 start_t = time.time()
 TOTAL_FILES = 0
 INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 def split_line(txt):
-    delims = [',']
+    delims = ['	']
     for d in delims:
-        result = txt.strip().split(d, maxsplit=1)
-        if len(result) > 2: 
-            result[0] = result[0].strip()
-            result[1] = result[1].strip()
+        result = txt.strip().split(d)
+        if len(result) >=2: 
             return result
 
     return [txt] # If nothing worked, return the input
@@ -22,21 +23,37 @@ def delete_inserted_file(file_path):
 
 
 def inserter(pathes,P_ID):
+    global TOTAL_FILES
+    global INSERTED_FILES
+    global INSERTED_ROWS
     for file_path in pathes:
         input_file = open(file_path,"r")
         current_batch = []
         insert_s_time = time.time()
         with open(file_path,"r") as input_file:
-            print("\n start file "+file_path+" =>" + str(P_ID))
-            results = [[r.strip().replace('""','').replace('\'\'','') for r in line.split(',')] for line in input_file.read().splitlines()]
-            results = [[r for r in row if r] for row in results if row]
-            lines =  [row for row in results if row]
-            
-            print(lines)
+            try:
+                print("\n start file "+file_path+" =>" + str(P_ID))
+                lines = input_file.read().splitlines()
+                for line in lines: 
+                    try:
+                        split = split_line(line)
+                        if(len(split) >=2):
+                            current_batch.append({"username":split[1], "email":split[2],"password":split[3],"ipaddress":split[4], "source":file_path})
+                            INSERTED_ROWS +=1
+                        else:
+                            print(split)
+                    except Exception:
+                        print(traceback.format_exc())
+                        print(split)
+                print(current_batch[1:100])
+            except:
+                print(traceback.format_exc())
+                print('** File'+file_path+' failed to insert => skip')
+        
 
-def path_splitter(producers_count):
+def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted/facebook/splitters/'
+    reader_path = '/home/nawaf/MyFitnessPal/splitters/Data'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
@@ -44,10 +61,11 @@ def path_splitter(producers_count):
                 TOTAL_FILES +=1
                 start_t = time.time()
                 pathes.append(os.path.join(path, file))
+    #batches = np.array_split(pathes,producers_count)
     return pathes
 
 def main():
-    pathes = path_splitter(1)
+    pathes = path_splitter()
     inserter(pathes,1)
     print ("\n Time Taken: %.3f sec" % (time.time()-start_t))
 

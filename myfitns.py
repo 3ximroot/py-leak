@@ -1,5 +1,7 @@
 import os,time,traceback
 from pymongo import MongoClient
+import gc
+ 
  
 myclient = MongoClient("mongodb://localhost:27017/")
  
@@ -13,21 +15,14 @@ TOTAL_FILES = 0
 INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
-def split_line(txt, source):
-    try:
-        object_line = txt
-        return {"name":object_line['fullName'].get('displayName',None),
-                "phone":object_line['contactInformation'].get('primaryPhone',None),
-                "s_phone":object_line['contactInformation'].get('secondaryPhone',None),
-                "email":object_line['contactInformation'].get('email',None),
-                "dob":object_line['basicInformation'].get('dateOfBirth',None),
-                "addresses":object_line.get('address',None),
-                "documents":object_line.get('documents',None),
-                "source":source,
-                }
-    except Exception:
-        print(traceback.format_exc())
-    
+def split_line(txt):
+    delims = ['	']
+    for d in delims:
+        result = txt.strip().split(d)
+        if len(result) >=2: 
+            return result
+
+    return [txt] # If nothing worked, return the input
 
 def delete_inserted_file(file_path):
     if os.path.exists(file_path):
@@ -40,28 +35,26 @@ def inserter(pathes,P_ID):
     global INSERTED_FILES
     global INSERTED_ROWS
     for file_path in pathes:
+        gc.collect()
         input_file = open(file_path,"r")
         current_batch = []
         insert_s_time = time.time()
         with open(file_path,"r") as input_file:
             try:
-                lines = input_file.read().splitlines()
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                for line in lines:
-                    line_ob = eval(line)
-                    line_ob = line_ob.get('items',None)
-                    
-                    if(line_ob != None):
-                        for ob in line_ob:
-                            if(ob != None):
-                                row = ob
-                                if(row):
-                                    split = split_line(row,file_path)
-                                    if(split):
-                                        current_batch.append(split)
-                                        INSERTED_ROWS +=1
-                        
-            except Exception:
+                lines = input_file.read().splitlines()
+                for line in lines: 
+                    try:
+                        split = split_line(line)
+                        if(len(split) >=2):
+                            current_batch.append({"username":split[1], "email":split[2],"password":split[3],"ipaddress":split[4], "source":file_path})
+                            INSERTED_ROWS +=1
+                        else:
+                            print(split)
+                    except Exception:
+                        print(traceback.format_exc())
+                        print(split)
+            except:
                 print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
@@ -72,14 +65,14 @@ def inserter(pathes,P_ID):
                 print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
-            except Exception:
+            except:
                 print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/nawafpr8e/iyelo/done'
+    reader_path = '/home/nawaf/MyFitnessPal/splitters/Data'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:

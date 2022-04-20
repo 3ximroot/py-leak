@@ -1,7 +1,7 @@
 import threading
 import multiprocessing
 import numpy as np
-import os,time
+import os,time,traceback
 from pymongo import MongoClient
  
  
@@ -18,12 +18,10 @@ INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 def split_line(txt):
-    delims = [':',';',' ']
+    delims = [',']
     for d in delims:
-        result = txt.strip().split(d, maxsplit=1)
-        if len(result) == 2: 
-            result[0] = result[0].strip()
-            result[1] = result[1].strip()
+        result = txt.strip().split(d)
+        if len(result) >= 2:
             return result
 
     return [txt] # If nothing worked, return the input
@@ -47,13 +45,17 @@ def inserter(pathes,P_ID):
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 lines = input_file.read().splitlines()
                 for line in lines: 
-                    split = split_line(line)
-                    if(len(split) ==2):
-                        username = split[0]
-                        password = split[1].split("\n")[0] or split[1]
-                        current_batch.append({"username":username, "password":password, "source":file_path})
-                        INSERTED_ROWS +=1
-            except:
+                    try:
+                        split = split_line(line)
+                        if(len(split) >=2):
+                            current_batch.append({"firstname":split[0], "lastname":split[1],"username":split[2],"ipaddress":split[3],"email":split[len(split)-6], "source":file_path})
+                            INSERTED_ROWS +=1
+                        else:
+                            print(split)
+                    except Exception:
+                        print(split)
+            except Exception:
+                print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
         if(len(current_batch) >0):
@@ -63,13 +65,14 @@ def inserter(pathes,P_ID):
                 print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
-            except:
+            except Exception:
+                print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         
 
 def path_splitter(producers_count):
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted'
+    reader_path = '/home/nawaf/nawafmhm/YouNow_RF/Data'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
