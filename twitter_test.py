@@ -1,14 +1,6 @@
 import os,time,traceback
 from pymongo import MongoClient
  
- 
-myclient = MongoClient("mongodb://localhost:27017/")
- 
-# database
-db = myclient["powned"]
- 
-collection = db["users"]
-
 start_t = time.time()
 TOTAL_FILES = 0
 INSERTED_FILES = 0
@@ -22,12 +14,6 @@ def split_line(txt):
             return result
 
     return [txt] # If nothing worked, return the input
-
-def delete_inserted_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return True
-
 
 def inserter(pathes,P_ID):
     global TOTAL_FILES
@@ -52,17 +38,7 @@ def inserter(pathes,P_ID):
                     except Exception:
                         print(traceback.format_exc())
                         print(split)
-            except Exception:
-                print(traceback.format_exc())
-                print('** File'+file_path+' failed to insert => skip')
-        INSERTED_FILES +=1
-        if(len(current_batch) >0):
-            try:
-                collection.insert_many(current_batch, ordered=False)
-                delete_inserted_file(file_path)
-                print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
-                print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
-                print("\n ROWS INSERTED "+str(INSERTED_ROWS))
+                print(current_batch[1:100])
             except Exception:
                 print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')

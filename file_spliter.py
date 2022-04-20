@@ -22,7 +22,10 @@ for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Canva_RF/Data
                             n_path = 'splitters/'+folder_name+'/'+small_filename
                             print(os.path.join(splitted_path, n_path))
                             smallfile = open(os.path.join(splitted_path, n_path), "w")
-                        smallfile.write(line)
+                        try:
+                            smallfile.write(line)
+                        except:
+                            pass
                     if smallfile:
                         smallfile.close()
                 except Exception as e:
