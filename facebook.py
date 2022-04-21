@@ -32,24 +32,22 @@ def inserter(pathes,P_ID):
         with open(file_path,"r") as input_file:
             try:
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                results = [[r.strip().replace('""','').replace('\'\'','') for r in line.split(',')] for line in input_file.read().splitlines()]
-                results = [[r for r in row if r] for row in results if row]
+                results = [[r.strip().replace('"','').replace('\'\'','') for r in line.split(',')] for line in input_file.read().splitlines()]
+                #results = [[r for r in row if r] for row in results if row]
+                #print(results)
                 lines =  [row for row in results if row]
-                
+                print(lines)
                 for line in lines: 
                     if(len(line) >1):
                         current_batch.append({
                         "fid":line[0] if 0 < len(line) else None,
-                        "phone":line[1] if 1 < len(line) else None,
-                        "first_name":line[2] if 2 < len(line) else None,
-                        "last_name":line[3] if 3 < len(line) else None,
-                        "email":line[4] if 4 < len(line) else None,
-                        "birthday":line[5] if 5 < len(line) else None,
-                        "gender":line[6] if 6 < len(line) else None,
-                        "locale":line[7] if 7 < len(line) else None,
-                        "hometown":line[8] if 8 < len(line) else None,
-                        "location":line[9] if 9 < len(line) else None,
-                        "link":line[10] if 10 < len(line) else None,
+                        "phone":line[3] if 3 < len(line) else None,
+                        "first_name":line[6] if 6 < len(line) else None,
+                        "last_name":line[7] if 7 < len(line) else None,
+                        "email":line[2] if 2 < len(line) else None,
+                        "birthday":line[4] if 4 < len(line) else None,
+                        "gender":line[8] if 8 < len(line) else None,
+                        "location":line[17] if 17 < len(line) else None,
                         })
                         INSERTED_ROWS +=1
             except Exception:
@@ -69,7 +67,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted/facebook/splitters/'
+    reader_path = '/home/asim/Downloads/Programming/Python lab/dataleak/py-leak'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
