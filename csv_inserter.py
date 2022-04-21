@@ -56,7 +56,7 @@ def inserter(pathes,P_ID):
             try:
                 collection.insert_many(current_batch, ordered=False)
                 delete_inserted_file(file_path)
-                print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
+                print("\n inserted  in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
             except:
@@ -70,7 +70,7 @@ def path_splitter():
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
-            if file.endswith(".txt"):
+            if file.endswith(".csv"):
                 TOTAL_FILES +=1
                 start_t = time.time()
                 pathes.append(os.path.join(path, file))

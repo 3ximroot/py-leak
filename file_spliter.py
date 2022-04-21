@@ -2,9 +2,9 @@ import os,time,traceback
 
 lines_per_file = 5000000
 smallfile = None
-splitted_path = '/home/nawaf/Canva_RF'
+splitted_path = '/home/nawaf/facebook'
 t = time.time()
-for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Canva_RF/Data"):
+for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Saudi Arabia/Saudi Arabia"):
     
     for file in files:
         if file.endswith(".txt"):

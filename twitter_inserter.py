@@ -1,6 +1,3 @@
-import threading
-import multiprocessing
-import numpy as np
 import os,time,traceback
 from pymongo import MongoClient
  
@@ -18,12 +15,10 @@ INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 def split_line(txt):
-    delims = [':',';',' ']
+    delims = [':']
     for d in delims:
-        result = txt.strip().split(d, maxsplit=1)
-        if len(result) == 2: 
-            result[0] = result[0].strip()
-            result[1] = result[1].strip()
+        result = txt.strip().split(d,maxsplit=1)
+        if len(result) >= 2:
             return result
 
     return [txt] # If nothing worked, return the input
@@ -47,16 +42,16 @@ def inserter(pathes,P_ID):
                 print("\n start file "+file_path+" =>" + str(P_ID))
                 #lines = input_file.read().splitlines()
                 for line in input_file: 
-                    split = []
                     try:
                         split = split_line(line)
+                        if(len(split) >=2):
+                            current_batch.append({"email":split[0], "password":split[1], "source":file_path})
+                            INSERTED_ROWS +=1
+                        else:
+                            print(split)
                     except Exception:
-                        pass
-                    if(len(split) ==2):
-                        email = split[0]
-                        password = split[1].split("\n")[0] or split[1]
-                        current_batch.append({"email":email, "password":password, "source":file_path})
-                        INSERTED_ROWS +=1
+                        print(traceback.format_exc())
+                        print(split)
             except Exception:
                 print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
@@ -73,7 +68,7 @@ def inserter(pathes,P_ID):
                 print('** File'+file_path+' failed to insert => skip')
         
 
-def path_splitter(producers_count):
+def path_splitter():
     global TOTAL_FILES
     reader_path = '/home/nawaf/nawafmhm/Twitter_RF/twitter'
     pathes = []
@@ -83,13 +78,10 @@ def path_splitter(producers_count):
                 TOTAL_FILES +=1
                 start_t = time.time()
                 pathes.append(os.path.join(path, file))
-    #batches = np.array_split(pathes,producers_count)
     return pathes
 
 def main():
-    max_producers = multiprocessing.cpu_count() - 2
-    pathes = path_splitter(max_producers)
-    print(max_producers, 'multiprocessing used')
+    pathes = path_splitter()
     inserter(pathes,1)
     print ("\n Time Taken: %.3f sec" % (time.time()-start_t))
 
