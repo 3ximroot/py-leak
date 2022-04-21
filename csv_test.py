@@ -1,5 +1,6 @@
 
-import os,time,traceback,csv
+import os,time,traceback
+from csv import reader
 
 
 start_t = time.time()
@@ -34,19 +35,19 @@ def inserter(pathes,P_ID):
         with open(file_path,"r") as input_file:
             try:
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                reader = csv.reader(input_file)
-                for i, line in enumerate(reader): 
+                readerer = reader(input_file)
+                for i, line in enumerate(readerer): 
                     try:
-                        split = line.split()
-                        if(len(split) >=2):
-                            current_batch.append({"name":split[1], "username":split[3],"twitter":split[4],"instagram":split[5], "source":file_path})
+                        spliter = line
+                        if(len(spliter) >=2):
+                            current_batch.append({"name":spliter[1], "username":spliter[3],"twitter":spliter[4],"instagram":spliter[5], "source":file_path})
                             INSERTED_ROWS +=1
                             lines +=1
                         else:
-                            print(split)
+                            print(spliter)
                     except Exception:
                         print(traceback.format_exc())
-                        print(split)
+                        print(line)
                 print(current_batch[1:100])
             except:
                 print(traceback.format_exc())
@@ -55,11 +56,11 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/MyFitnessPal/splitters/Data'
+    reader_path = '/home/nawaf/x'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
-            if file.endswith(".txt"):
+            if file.endswith(".csv"):
                 TOTAL_FILES +=1
                 start_t = time.time()
                 pathes.append(os.path.join(path, file))
