@@ -41,22 +41,27 @@ def inserter(pathes,P_ID):
                     if(len(line) >1):
                         current_batch.append({
                         "fid":line[0] if 0 < len(line) else None,
+                        "email":line[2] if 2 < len(line) else None,
                         "phone":line[3] if 3 < len(line) else None,
+                        "username":line[11] if 11 < len(line) else None,
                         "first_name":line[6] if 6 < len(line) else None,
                         "last_name":line[7] if 7 < len(line) else None,
-                        "email":line[2] if 2 < len(line) else None,
+                        "link":line[9] if 9 < len(line) else None,
                         "birthday":line[4] if 4 < len(line) else None,
                         "gender":line[8] if 8 < len(line) else None,
                         "location":line[17] if 17 < len(line) else None,
+                        "source":file_path,
+                        "line":line_no
                         })
                         INSERTED_ROWS +=1
+                    line_no +=1
             except Exception:
                 print(traceback.format_exc())
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
                 collection.insert_many(current_batch, ordered=False)
-                delete_inserted_file(file_path)
+                #delete_inserted_file(file_path)
                 print("\n inserted "+str(len(lines))+" in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))

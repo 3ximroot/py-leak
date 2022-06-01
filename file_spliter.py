@@ -20,7 +20,6 @@ for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Saudi Arabia/
                             small_filename = file_name+'_{}.txt'.format(lineno + lines_per_file)
                             os.makedirs((splitted_path+'/splitters/'+folder_name+'/'), exist_ok=True)
                             n_path = 'splitters/'+folder_name+'/'+small_filename
-                            print(os.path.join(splitted_path, n_path))
                             smallfile = open(os.path.join(splitted_path, n_path), "w")
                         try:
                             smallfile.write(line)
