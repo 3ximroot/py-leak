@@ -36,7 +36,7 @@ def inserter(pathes,P_ID):
                 #results = [[r for r in row if r] for row in results if row]
                 #print(results)
                 lines =  [row for row in results if row]
-                print(lines)
+                #print(lines)
                 for line in lines: 
                     if(len(line) >1):
                         current_batch.append({
@@ -67,7 +67,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/asim/Downloads/Programming/Python lab/dataleak/py-leak'
+    reader_path = '/home/nawaf/facebook/splitters/Saudi Arabia'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
