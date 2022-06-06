@@ -40,7 +40,7 @@ def inserter(pathes,P_ID):
                     try:
                         spliter = line
                         if(len(spliter) >=2):
-                            current_batch.append({"name":spliter[1], "username":spliter[3],"twitter":spliter[4],"instagram":spliter[5], "source":file_path})
+                            current_batch.append({"fname":spliter[0], "lname":spliter[1],"address":spliter[2],"city":spliter[3],"state":spliter[4],"zip":spliter[5],"phone":spliter[6],"email":spliter[7],"phone_carrier":spliter[8],"gender":spliter[9], "source":file_path})
                             INSERTED_ROWS +=1
                             lines +=1
                         else:
@@ -56,7 +56,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/x'
+    reader_path = '/home/nawaf/dbx'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
