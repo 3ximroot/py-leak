@@ -82,6 +82,11 @@ def path_splitter():
                 pathes.append(os.path.join(path, file))
     return pathes
 
+def is_mail(email):
+    if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+        return True
+    else:
+        return False
 
 def main():
     pathes = path_splitter()
