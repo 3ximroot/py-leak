@@ -100,12 +100,16 @@ def main():
     # listed in sys.argv[1:]
     # or stdin if no args given.
     try:
-        for line in fileinput.input():
-            # Look for an INSERT statement and parse it.
-            if is_insert(line):
-                values = get_values(line)
-                if values_sanity_check(values):
-                    parse_values(values, sys.stdout)
+        for path, currentDirectory, files in os.walk("/home/nawaf/nawafmhm/Saudi Arabia/Saudi Arabia"):
+    
+            for file in files:
+                if file.endswith(".sql"):
+                    for line in file:
+                        # Look for an INSERT statement and parse it.
+                        if is_insert(line):
+                            values = get_values(line)
+                            if values_sanity_check(values):
+                                parse_values(values, sys.stdout)
     except KeyboardInterrupt:
         sys.exit(0)
 
