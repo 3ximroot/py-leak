@@ -35,7 +35,11 @@ def inserter(pathes,P_ID):
         with open(file_path,"r") as input_file:
             try:
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                reader = json.loads(input_file)
+                response = input_file.read()
+                response = response.replace('\n', '')
+                response = response.replace('}{', '},{')
+                response = "[" + response + "]"
+                reader = json.loads(response)
                 for i, line in enumerate(reader): 
                     try:
                         #"FIRST","LAST","ADDRESS","CITY","STATE","ZIP","CELLPHONE","EMAIL","PHONE CARRIER","GENDER","HOME_VALUE","HOUSEHOLD_INCOME",,,,,,,,,,,,,,,,,,,,,
