@@ -6,9 +6,9 @@ import gc
 myclient = MongoClient("mongodb://localhost:27017/")
  
 # database
-db = myclient["powned"]
+#db = myclient["powned"]
  
-collection = db["users2"]
+#collection = db["users2"]
 
 start_t = time.time()
 TOTAL_FILES = 0
@@ -16,10 +16,6 @@ INSERTED_FILES = 0
 INSERTED_ROWS = 0
 
 
-def delete_inserted_file(file_path):
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    return True
 
 
 def inserter(pathes,P_ID):
@@ -35,7 +31,7 @@ def inserter(pathes,P_ID):
         with open(file_path,"r") as input_file:
             try:
                 print("\n start file "+file_path+" =>" + str(P_ID))
-                reader = json.loads(input_file)
+                reader = json.loads(input_file.read())
                 for i, line in enumerate(reader): 
                     try:
                         #"FIRST","LAST","ADDRESS","CITY","STATE","ZIP","CELLPHONE","EMAIL","PHONE CARRIER","GENDER","HOME_VALUE","HOUSEHOLD_INCOME",,,,,,,,,,,,,,,,,,,,,
@@ -50,17 +46,19 @@ def inserter(pathes,P_ID):
                         })
                         INSERTED_ROWS +=1
                         lines +=1
+
                     except Exception:
                         print(traceback.format_exc())
                         print(line)
+                print(current_batch[1:100])
             except:
                 print(traceback.format_exc())
                 print('** File'+file_path+' failed to insert => skip')
         INSERTED_FILES +=1
         if(len(current_batch) >0):
             try:
-                collection.insert_many(current_batch, ordered=False)
-                delete_inserted_file(file_path)
+                #collection.insert_many(current_batch, ordered=False)
+                #delete_inserted_file(file_path)
                 print("\n inserted  in " + str(time.time()-insert_s_time)+" =>" + str(P_ID))
                 print("\n FILES PROGRESS "+str(INSERTED_FILES)+"/"+str(TOTAL_FILES)+" =>" + str(P_ID))
                 print("\n ROWS INSERTED "+str(INSERTED_ROWS))
@@ -71,7 +69,7 @@ def inserter(pathes,P_ID):
 
 def path_splitter():
     global TOTAL_FILES
-    reader_path = '/home/nawaf/splitted/PeopleDataLabs_RF/Data'
+    reader_path = '/home/nawaf/splitted/PeopleDataLabs_RF/Data/x'
     pathes = []
     for path, currentDirectory, files in os.walk(reader_path):
         for file in files:
@@ -89,3 +87,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+#
